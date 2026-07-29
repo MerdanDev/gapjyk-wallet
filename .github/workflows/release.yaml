@@ -1,0 +1,130 @@
+name: release
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Deliberately not cancel-in-progress: cancelling midway through creating a
+  # release or uploading an asset leaves the tag half published.
+  cancel-in-progress: false
+
+on:
+  push:
+    tags:
+      - "v*"
+  # Manual runs build and upload nothing, so the workflow can be exercised
+  # without spending a version number.
+  workflow_dispatch:
+
+jobs:
+  # A tag must not ship what main would have rejected, so this is the same
+  # reusable workflow main.yaml calls, with the same inputs.
+  verify:
+    uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/flutter_package.yml@v1
+    with:
+      flutter_channel: stable
+      min_coverage: 10
+
+  build-android:
+    needs: verify
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v4
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: 📦 Install Dependencies
+        run: flutter pub get
+
+      # This app ships on the Play Store, where the build number may only ever
+      # climb, so pubspec.yaml stays the source of truth for the version and the
+      # tag merely records it. Overriding the build number from a run number — as
+      # a greenfield app can afford to — would drop it below what Play has seen.
+      - name: 🔖 Check tag matches pubspec
+        id: version
+        run: |
+          FULL="$(grep '^version:' pubspec.yaml | sed 's/^version:[[:space:]]*//' | tr -d '\r')"
+          NAME="${FULL%%+*}"
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF_NAME#v}"
+            if [[ "${TAG}" != "${NAME}" ]]; then
+              echo "::error::Tag v${TAG} does not match pubspec version ${NAME}. Bump pubspec.yaml or move the tag."
+              exit 1
+            fi
+          fi
+          echo "name=${NAME}" >> "$GITHUB_OUTPUT"
+          echo "Releasing ${FULL}"
+
+      # Written to the runner's temp directory rather than the workspace so it can
+      # never be picked up by a later step that globs the checkout.
+      - name: 🔐 Restore keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [[ -z "${ANDROID_KEYSTORE_BASE64}" ]]; then
+            echo "::error::ANDROID_KEYSTORE_BASE64 is not set. Add the signing secrets before tagging a release."
+            exit 1
+          fi
+          echo "${ANDROID_KEYSTORE_BASE64}" | base64 --decode > "${RUNNER_TEMP}/release-keystore.jks"
+
+      # x86_64 is ~30MB of a 91MB APK and serves emulators only, so it is dropped
+      # from this artifact. Note this is a flag on the build, not a Gradle-level
+      # exclusion: the app bundle uploaded to Play must keep x86_64 so Chromebooks
+      # and x86 devices can still install it.
+      - name: 🤖 Build APK
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/release-keystore.jks
+          ANDROID_KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD }}
+        run: |
+          flutter build apk --release \
+            --flavor production \
+            --target lib/main_production.dart \
+            --target-platform android-arm,android-arm64
+          mv build/app/outputs/flutter-apk/app-production-release.apk \
+             "gapjyk-wallet-${{ steps.version.outputs.name }}.apk"
+
+      # always(), so a failed build does not leave the decoded key on the runner.
+      - name: 🧹 Remove keystore
+        if: always()
+        run: rm -f "${RUNNER_TEMP}/release-keystore.jks"
+
+      - name: ⬆️ Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: gapjyk-wallet-apk
+          path: gapjyk-wallet-*.apk
+          if-no-files-found: error
+
+  release:
+    needs: build-android
+    runs-on: ubuntu-latest
+    # Only a tag publishes. A manual run stops after building, which is the point
+    # of being able to trigger one.
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+
+    steps:
+      - name: ⬇️ Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: gapjyk-wallet-apk
+
+      - name: 🚀 Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: gapjyk-wallet-*.apk
+          generate_release_notes: true
+          fail_on_unmatched_files: true
