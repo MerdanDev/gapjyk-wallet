@@ -212,6 +212,19 @@
     }
   },
   "restoreCurrencyConfirm": "Switch",
+  "restoreLatest": "Restore latest automatic backup",
+  "autoBackup": "Automatic backup",
+  "autoBackupSubtitle": "Save a dated copy when you open and close the app",
+  "autoBackupLast": "Last backup: {when}",
+  "@autoBackupLast": {
+    "placeholders": {
+      "when": { "type": "String" }
+    }
+  },
+  "autoBackupEnabledMessage": "Automatic backup is on",
+  "onbBackupTitle": "Never lose your data",
+  "onbBackupBody": "Turn on automatic backups. A dated copy is saved to your Downloads every time you open and close the app.",
+  "enableAutoBackup": "Enable automatic backup",
   "save": "Save",
   "save_success": "Successfully saved:",
   "scanBetaBadge": "Beta",

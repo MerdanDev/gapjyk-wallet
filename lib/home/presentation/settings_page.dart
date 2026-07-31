@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:wallet/core/backup_service.dart';
 import 'package:wallet/core/currency_cubit.dart';
 import 'package:wallet/counter/counter.dart';
 import 'package:wallet/counter/cubit/budget_cubit.dart';
@@ -66,7 +67,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _restoreBackup(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
-    final successMessage = context.l10n.restoreSuccess;
     final failedMessage = context.l10n.restoreFailed;
 
     // Accept the current `.xlsx` workbook and legacy `.csv` exports; the
@@ -94,6 +94,28 @@ class _SettingsPageState extends State<SettingsPage> {
       return;
     }
 
+    if (context.mounted) await _applyBackup(context, backup);
+  }
+
+  Future<void> _restoreLatestAutoBackup(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final failedMessage = context.l10n.restoreFailed;
+
+    final backup = await BackupService.instance.latestPrivateBackup();
+    if (backup == null) {
+      messenger.showSnackBar(SnackBar(content: Text(failedMessage)));
+      return;
+    }
+
+    if (context.mounted) await _applyBackup(context, backup);
+  }
+
+  /// Applies a decoded [backup] to the live state. Shared by manual restore and
+  /// "restore latest automatic backup" so both behave identically.
+  Future<void> _applyBackup(BuildContext context, BackupData backup) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final successMessage = context.l10n.restoreSuccess;
+
     // Restore categories and budgets first so transactions and their category
     // references land against an up-to-date set.
     CounterCategoryCubit.instance.restoreBackup(backup.categories);
@@ -112,6 +134,30 @@ class _SettingsPageState extends State<SettingsPage> {
     }
 
     messenger.showSnackBar(SnackBar(content: Text(successMessage)));
+  }
+
+  Future<void> _toggleAutoBackup(
+    BuildContext context, {
+    required bool on,
+  }) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final enabledMessage = context.l10n.autoBackupEnabledMessage;
+
+    await BackupService.instance.setEnabled(value: on);
+    if (!mounted) return;
+    setState(() {});
+    if (on) {
+      messenger.showSnackBar(SnackBar(content: Text(enabledMessage)));
+    }
+  }
+
+  String _autoBackupSubtitle(BuildContext context) {
+    final last = BackupService.instance.lastBackupAt;
+    if (last == null) return context.l10n.autoBackupSubtitle;
+    String two(int n) => n.toString().padLeft(2, '0');
+    final stamp = '${last.year}-${two(last.month)}-${two(last.day)} '
+        '${two(last.hour)}:${two(last.minute)}';
+    return context.l10n.autoBackupLast(stamp);
   }
 
   Future<bool> _confirmCurrencyChange(
@@ -239,6 +285,19 @@ class _SettingsPageState extends State<SettingsPage> {
               );
             },
           ),
+          SwitchListTile(
+            secondary: const Icon(Icons.cloud_sync_outlined),
+            title: Text(context.l10n.autoBackup),
+            subtitle: Text(_autoBackupSubtitle(context)),
+            value: BackupService.instance.enabled,
+            onChanged: (on) => _toggleAutoBackup(context, on: on),
+          ),
+          if (BackupService.instance.enabled)
+            ListTile(
+              leading: const Icon(Icons.history),
+              title: Text(context.l10n.restoreLatest),
+              onTap: () => _restoreLatestAutoBackup(context),
+            ),
           ListTile(
             leading: const Icon(Icons.backup_outlined),
             title: Text(context.l10n.backUp),

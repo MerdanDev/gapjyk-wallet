@@ -16,7 +16,9 @@ class App extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
-      navigatorObservers: [AnalyticsService.observer],
+      navigatorObservers: [
+        if (AnalyticsService.observer != null) AnalyticsService.observer!,
+      ],
       title: 'Gapjyk',
       darkTheme: ThemeData.dark().copyWith(
         colorScheme: darkColorScheme,

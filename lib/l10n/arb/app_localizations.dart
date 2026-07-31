@@ -1126,6 +1126,54 @@ abstract class AppLocalizations {
   /// **'Switch'**
   String get restoreCurrencyConfirm;
 
+  /// No description provided for @restoreLatest.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore latest automatic backup'**
+  String get restoreLatest;
+
+  /// No description provided for @autoBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic backup'**
+  String get autoBackup;
+
+  /// No description provided for @autoBackupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save a dated copy when you open and close the app'**
+  String get autoBackupSubtitle;
+
+  /// No description provided for @autoBackupLast.
+  ///
+  /// In en, this message translates to:
+  /// **'Last backup: {when}'**
+  String autoBackupLast(String when);
+
+  /// No description provided for @autoBackupEnabledMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic backup is on'**
+  String get autoBackupEnabledMessage;
+
+  /// No description provided for @onbBackupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Never lose your data'**
+  String get onbBackupTitle;
+
+  /// No description provided for @onbBackupBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on automatic backups. A dated copy is saved to your Downloads every time you open and close the app.'**
+  String get onbBackupBody;
+
+  /// No description provided for @enableAutoBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable automatic backup'**
+  String get enableAutoBackup;
+
   /// No description provided for @save.
   ///
   /// In en, this message translates to:

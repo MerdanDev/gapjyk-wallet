@@ -87,6 +87,24 @@ class SingletonSharedPreference {
     return instance._pref.setBool(KeyData.onboardingCompleted, value);
   }
 
+  static bool loadAutoBackupEnabled() {
+    return instance._pref.getBool(KeyData.autoBackupEnabled) ?? false;
+  }
+
+  static Future<bool> setAutoBackupEnabled({required bool value}) {
+    return instance._pref.setBool(KeyData.autoBackupEnabled, value);
+  }
+
+  static DateTime? loadLastAutoBackupAt() {
+    final raw = instance._pref.getString(KeyData.lastAutoBackupAt);
+    return raw == null ? null : DateTime.tryParse(raw);
+  }
+
+  static Future<bool> setLastAutoBackupAt(DateTime value) {
+    return instance._pref
+        .setString(KeyData.lastAutoBackupAt, value.toIso8601String());
+  }
+
   static String? loadIncomeExpenseBackup() {
     return instance._pref.getString(KeyData.incomeExpenseBackup);
   }

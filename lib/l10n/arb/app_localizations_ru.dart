@@ -551,6 +551,34 @@ class AppLocalizationsRu extends AppLocalizations {
   String get restoreCurrencyConfirm => 'Переключить';
 
   @override
+  String get restoreLatest => 'Восстановить последнюю копию';
+
+  @override
+  String get autoBackup => 'Автоматическое резервное копирование';
+
+  @override
+  String get autoBackupSubtitle =>
+      'Сохранять копию с датой при открытии и закрытии приложения';
+
+  @override
+  String autoBackupLast(String when) {
+    return 'Последняя копия: $when';
+  }
+
+  @override
+  String get autoBackupEnabledMessage => 'Автоматическое копирование включено';
+
+  @override
+  String get onbBackupTitle => 'Никогда не теряйте свои данные';
+
+  @override
+  String get onbBackupBody =>
+      'Включите автоматическое резервное копирование. Копия с датой сохраняется в «Загрузки» при каждом открытии и закрытии приложения.';
+
+  @override
+  String get enableAutoBackup => 'Включить автоматическое копирование';
+
+  @override
   String get save => 'Сохранять';
 
   @override

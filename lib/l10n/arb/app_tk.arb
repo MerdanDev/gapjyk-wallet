@@ -207,6 +207,19 @@
   "restoreFailed": "Bu ätiýaçlyk faýly okap bolmady",
   "restoreCurrencyPrompt": "Bu ätiýaçlyk nusgasy \"{symbol}\" pul birligini ulanýar. Oňa geçmelimi?",
   "restoreCurrencyConfirm": "Geç",
+  "restoreLatest": "Iň soňky awtomatiki nusgany dikeltmek",
+  "autoBackup": "Awtomatiki ätiýaçlyk nusga",
+  "autoBackupSubtitle": "Programmany açyp-ýapanyňyzda sene bilen nusga saklamak",
+  "autoBackupLast": "Soňky nusga: {when}",
+  "@autoBackupLast": {
+    "placeholders": {
+      "when": { "type": "String" }
+    }
+  },
+  "autoBackupEnabledMessage": "Awtomatiki ätiýaçlyk nusga açyk",
+  "onbBackupTitle": "Maglumatlaryňyzy hiç haçan ýitirmäň",
+  "onbBackupBody": "Awtomatiki ätiýaçlyk nusgalary açyň. Programmany açyp-ýapanyňyzda sene bilen nusga Ýüklenenler bukjasyna saklanýar.",
+  "enableAutoBackup": "Awtomatiki ätiýaçlyk nusgany açmak",
   "save": "Ýatda saklamak",
   "save_success": "Üstünlik bilen ýatda saklandy:",
   "scanBetaBadge": "Beta",
