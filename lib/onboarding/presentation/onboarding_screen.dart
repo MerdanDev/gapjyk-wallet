@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wallet/core/backup_service.dart';
 import 'package:wallet/core/currency_cubit.dart';
 import 'package:wallet/core/notification_service.dart';
 import 'package:wallet/core/shared_preference.dart';
@@ -23,7 +24,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     text: CurrencyCubit.instance.state,
   );
   int _index = 0;
-  static const int _pageCount = 5;
+  static const int _pageCount = 6;
 
   @override
   void dispose() {
@@ -83,6 +84,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   const _AddEntryPage(),
                   const _CategoriesPage(),
                   const _RemindersPage(),
+                  const _BackupPage(),
                 ],
               ),
             ),
@@ -298,6 +300,42 @@ class _RemindersPageState extends State<_RemindersPage> {
               onPressed: _enable,
               icon: const Icon(Icons.notifications_outlined),
               label: Text(l10n.enableReminders),
+            ),
+    );
+  }
+}
+
+class _BackupPage extends StatefulWidget {
+  const _BackupPage();
+
+  @override
+  State<_BackupPage> createState() => _BackupPageState();
+}
+
+class _BackupPageState extends State<_BackupPage> {
+  bool _enabled = false;
+
+  Future<void> _enable() async {
+    // Turns the feature on. The first backup runs later, once there is data to
+    // save and the app is opened/closed — a brand-new user has nothing yet.
+    await BackupService.instance.setEnabled(value: true);
+    if (!mounted) return;
+    setState(() => _enabled = true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return _OnboardingPage(
+      icon: Icons.cloud_sync_outlined,
+      title: l10n.onbBackupTitle,
+      body: l10n.onbBackupBody,
+      child: _enabled
+          ? const Icon(Icons.check_circle, color: Colors.green, size: 40)
+          : FilledButton.icon(
+              onPressed: _enable,
+              icon: const Icon(Icons.backup_outlined),
+              label: Text(l10n.enableAutoBackup),
             ),
     );
   }

@@ -25,6 +25,12 @@
 	</array>
 	<key>CFBundleName</key>
 	<string>$(FLAVOR_APP_NAME)</string>
+	<!-- Expose the app's Documents folder in the Files app so automatic
+	     backups written there are user-accessible. -->
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

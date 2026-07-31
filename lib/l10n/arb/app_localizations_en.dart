@@ -548,6 +548,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restoreCurrencyConfirm => 'Switch';
 
   @override
+  String get restoreLatest => 'Restore latest automatic backup';
+
+  @override
+  String get autoBackup => 'Automatic backup';
+
+  @override
+  String get autoBackupSubtitle =>
+      'Save a dated copy when you open and close the app';
+
+  @override
+  String autoBackupLast(String when) {
+    return 'Last backup: $when';
+  }
+
+  @override
+  String get autoBackupEnabledMessage => 'Automatic backup is on';
+
+  @override
+  String get onbBackupTitle => 'Never lose your data';
+
+  @override
+  String get onbBackupBody =>
+      'Turn on automatic backups. A dated copy is saved to your Downloads every time you open and close the app.';
+
+  @override
+  String get enableAutoBackup => 'Enable automatic backup';
+
+  @override
   String get save => 'Save';
 
   @override

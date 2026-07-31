@@ -18,4 +18,10 @@ class KeyData {
 
   /// Set once the title→category migration has run and persisted a clean store.
   static const String titleCategoryMigrationDone = 'titleCategoryMigrationDone';
+
+  /// Whether automatic backups (on app open/close) are enabled.
+  static const String autoBackupEnabled = 'autoBackupEnabled';
+
+  /// ISO-8601 timestamp of the last successful automatic backup, for display.
+  static const String lastAutoBackupAt = 'lastAutoBackupAt';
 }

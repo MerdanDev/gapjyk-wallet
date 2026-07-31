@@ -545,6 +545,34 @@ class AppLocalizationsTk extends AppLocalizations {
   String get restoreCurrencyConfirm => 'Geç';
 
   @override
+  String get restoreLatest => 'Iň soňky awtomatiki nusgany dikeltmek';
+
+  @override
+  String get autoBackup => 'Awtomatiki ätiýaçlyk nusga';
+
+  @override
+  String get autoBackupSubtitle =>
+      'Programmany açyp-ýapanyňyzda sene bilen nusga saklamak';
+
+  @override
+  String autoBackupLast(String when) {
+    return 'Soňky nusga: $when';
+  }
+
+  @override
+  String get autoBackupEnabledMessage => 'Awtomatiki ätiýaçlyk nusga açyk';
+
+  @override
+  String get onbBackupTitle => 'Maglumatlaryňyzy hiç haçan ýitirmäň';
+
+  @override
+  String get onbBackupBody =>
+      'Awtomatiki ätiýaçlyk nusgalary açyň. Programmany açyp-ýapanyňyzda sene bilen nusga Ýüklenenler bukjasyna saklanýar.';
+
+  @override
+  String get enableAutoBackup => 'Awtomatiki ätiýaçlyk nusgany açmak';
+
+  @override
   String get save => 'Ýatda saklamak';
 
   @override
