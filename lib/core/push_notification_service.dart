@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:device_info_plus/device_info_plus.dart';
@@ -92,12 +93,19 @@ class PushNotificationService {
       _handleMessageOpened(initialMessage);
     }
 
-    // 7. Token. Send this to your backend / topic so the device can be
-    // targeted. Logged for now.
-    final token = await _messaging.getToken();
-    log('FCM token: $token');
+    // 7. Token. Fetched fire-and-forget: getToken() needs a network round-trip
+    // and has nothing cached on a fresh install or after "Clear data", so
+    // awaiting it here stalled bootstrap before the first frame and left the
+    // app stuck on the splash screen. Nothing consumes the token yet, so it is
+    // only logged — and only in debug builds, to keep device tokens out of
+    // production logs.
+    unawaited(
+      _messaging.getToken().then((token) {
+        if (kDebugMode) log('FCM token: $token');
+      }),
+    );
     _messaging.onTokenRefresh.listen((newToken) {
-      log('FCM token refreshed: $newToken');
+      if (kDebugMode) log('FCM token refreshed: $newToken');
     });
   }
 
